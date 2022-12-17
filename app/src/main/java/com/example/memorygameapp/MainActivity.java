@@ -2,6 +2,7 @@ package com.example.memorygameapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -9,6 +10,7 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
@@ -25,17 +27,22 @@ public class MainActivity extends AppCompatActivity {
     int[] gameSequence = new int[120];
     int arrayIndex = 0;
 
+    TextView timeDisplay;
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getSupportActionBar ().hide ();
 
         bRed = findViewById(R.id.btnRed);
         bBlue = findViewById(R.id.btnBlue);
         bYellow = findViewById(R.id.btnYellow);
         bGreen = findViewById(R.id.btnGreen);
+
+        timeDisplay = findViewById(R.id.txt_Time);
     }
 
     public void doPlay(View view) {
@@ -74,19 +81,25 @@ public class MainActivity extends AppCompatActivity {
         }   // end switch
     }
 
-    private void flashButton(Button button) {
+    private void flashButton(Button button)
+    {
         fb = button;
         Handler handler = new Handler();
-        Runnable r = new Runnable() {
-            public void run() {
-
+        Runnable r = new Runnable()
+        {
+            public void run()
+            {
                 fb.setPressed(true);
+                fb.setBackgroundColor(Color.WHITE);
                 fb.invalidate();
                 fb.performClick();
                 Handler handler1 = new Handler();
-                Runnable r1 = new Runnable() {
-                    public void run() {
+                Runnable r1 = new Runnable()
+                {
+                    public void run()
+                    {
                         fb.setPressed(false);
+                        fb.setBackgroundColor(Color.MAGENTA);
                         fb.invalidate();
                     }
                 };
@@ -97,8 +110,10 @@ public class MainActivity extends AppCompatActivity {
         handler.postDelayed(r, 600);
     }
 
-    public void doTest(View view) {
-        for (int i = 0; i < sequenceCount; i++) {
+    public void doTest(View view)
+    {
+        for (int i = 0; i < sequenceCount; i++)
+        {
             int x = getRandom(sequenceCount);
 
             Toast.makeText(this, "Number = " + x, Toast.LENGTH_SHORT).show();
@@ -116,20 +131,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /*Timer*/
-    CountDownTimer ct = new CountDownTimer(6000,  1500) {
-
-        public void onTick(long millisUntilFinished) {
-            //mTextField.setText("seconds remaining: " + millisUntilFinished / 1500);
+    CountDownTimer ct = new CountDownTimer(6000,  1500)
+    {
+        public void onTick(long millisUntilFinished)
+        {
+            timeDisplay.setText("seconds remaining: " + millisUntilFinished / 1500);
             oneButton();
             //here you can have your logic to set text to edittext
         }
 
-        public void onFinish() {
+        public void onFinish()
+        {
             //mTextField.setText("done!");
             // we now have the game sequence
 
             for (int i = 0; i< arrayIndex; i++)
+            {
                 Log.d("game sequence", String.valueOf(gameSequence[i]));
+            }
+
             // start next activity
 
             // put the sequence into the next activity
