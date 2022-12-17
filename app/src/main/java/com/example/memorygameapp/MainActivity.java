@@ -2,16 +2,16 @@ package com.example.memorygameapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.graphics.Color;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.content.Intent;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,10 +25,14 @@ public class MainActivity extends AppCompatActivity {
     int sequenceCount = 4, n = 0;
     private Object mutex = new Object();
     int[] gameSequence = new int[120];
-    int arrayIndex = 0;
+    int counter = 0;
 
     TextView timeDisplay;
 
+
+    ScoreManager scoremanager;
+
+    DatabaseManager dbManager;
 
 
     @Override
@@ -37,12 +41,21 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         getSupportActionBar ().hide ();
 
+        //Database setup
+        Context mContext = getApplicationContext();
+
         bRed = findViewById(R.id.btnRed);
         bBlue = findViewById(R.id.btnBlue);
         bYellow = findViewById(R.id.btnYellow);
         bGreen = findViewById(R.id.btnGreen);
 
         timeDisplay = findViewById(R.id.txt_Time);
+
+        //TODO: testing db
+        scoremanager = new ScoreManager(mContext);
+        scoremanager.buildNewHighScore("TestUser", 1500);
+        scoremanager.AddTestScoreData();
+
     }
 
     public void doPlay(View view) {
@@ -50,11 +63,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // return a number between 1 and maxValue
-    private int getRandom(int maxValue) {
+    private int getRandom(int maxValue)
+    {
         return ((int) ((Math.random() * maxValue) + 1));
     }
 
-    private void oneButton() {
+    private void oneButton()
+    {
         n = getRandom(sequenceCount);
 
         Toast.makeText(this, "Number = " + n, Toast.LENGTH_SHORT).show();
@@ -62,19 +77,19 @@ public class MainActivity extends AppCompatActivity {
         switch (n) {
             case 1:
                 flashButton(bBlue);
-                gameSequence[arrayIndex++] = BLUE;
+                gameSequence[counter++] = BLUE;
                 break;
             case 2:
                 flashButton(bRed);
-                gameSequence[arrayIndex++] = RED;
+                gameSequence[counter++] = RED;
                 break;
             case 3:
                 flashButton(bYellow);
-                gameSequence[arrayIndex++] = YELLOW;
+                gameSequence[counter++] = YELLOW;
                 break;
             case 4:
                 flashButton(bGreen);
-                gameSequence[arrayIndex++] = GREEN;
+                gameSequence[counter++] = GREEN;
                 break;
             default:
                 break;
@@ -84,13 +99,13 @@ public class MainActivity extends AppCompatActivity {
     private void flashButton(Button button)
     {
         fb = button;
+        String buttonText = String.valueOf(fb.getText());
         Handler handler = new Handler();
         Runnable r = new Runnable()
         {
             public void run()
             {
                 fb.setPressed(true);
-                fb.setBackgroundColor(Color.WHITE);
                 fb.invalidate();
                 fb.performClick();
                 Handler handler1 = new Handler();
@@ -99,7 +114,6 @@ public class MainActivity extends AppCompatActivity {
                     public void run()
                     {
                         fb.setPressed(false);
-                        fb.setBackgroundColor(Color.MAGENTA);
                         fb.invalidate();
                     }
                 };
@@ -108,26 +122,6 @@ public class MainActivity extends AppCompatActivity {
             } // end runnable
         };
         handler.postDelayed(r, 600);
-    }
-
-    public void doTest(View view)
-    {
-        for (int i = 0; i < sequenceCount; i++)
-        {
-            int x = getRandom(sequenceCount);
-
-            Toast.makeText(this, "Number = " + x, Toast.LENGTH_SHORT).show();
-
-            if (x == 1)
-                flashButton(bBlue);
-            else if (x == 2)
-                flashButton(bRed);
-            else if (x == 3)
-                flashButton(bYellow);
-            else if (x == 4)
-                flashButton(bGreen);
-        }
-
     }
 
     /*Timer*/
@@ -145,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
             //mTextField.setText("done!");
             // we now have the game sequence
 
-            for (int i = 0; i< arrayIndex; i++)
+            for (int i = 0; i< counter; i++)
             {
                 Log.d("game sequence", String.valueOf(gameSequence[i]));
             }
@@ -162,4 +156,18 @@ public class MainActivity extends AppCompatActivity {
             // int[] arrayB = extras.getIntArray("numbers");
         }
     };
+
+    public void doHighScoreTable(View view)
+    {
+        //Create new intent instance for the high score table
+        Intent summaryPage = new Intent(this, HighScoreTable.class);
+        //Pass all the analysis data to the new intent
+//        summaryPage.putExtra("date", currentDate);
+//        summaryPage.putExtra("distance", distance);
+//        summaryPage.putExtra("calories", calories);
+//        //Lastly, pass over the time
+//        summaryPage.putExtra("time", time);
+//        //Load up the new activity
+        startActivity(summaryPage);
+    }
 }

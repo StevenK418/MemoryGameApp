@@ -1,45 +1,75 @@
 package com.example.memorygameapp;
 
+/**
+ * Class defining a Highscore model
+ * @param <HighScore>
+ */
 public class HighScore <HighScore>
 {
-    int _id;
-    String _name;
-    int _highscore;
+    int scoreId;
+    String playerName;
+    int playerHighScore;
 
-    public HighScore(){   }
+    /**
+     * Default constructor
+     */
+    public HighScore()
+    {
+
+    }
+    /**
+     * Parameterised constructor to build Highscore model
+     * as used by DB.
+     * @param id
+     * @param name
+     * @param highscore
+     */
     public HighScore(int id, String name, int highscore)
     {
-        this._id = id;
-        this._name = name;
-        this._highscore = highscore;
+        this.scoreId = id;
+        this.playerName = name;
+        this.playerHighScore = highscore;
     }
 
-    public HighScore(String name, int highscore){
-        this._name = name;
-        this._highscore = highscore;
-    }
-    public int getID(){
-        return this._id;
-    }
-
-    public void setID(int id){
-        this._id = id;
-    }
-
-    public String getName(){
-        return this._name;
+    /**
+     * Parameterised constructor to build user highscore
+     * @param name
+     * @param highscore
+     */
+    public HighScore(String name, int highscore)
+    {
+        this.playerName = name;
+        this.playerHighScore = highscore;
     }
 
-    public void setName(String name){
-        this._name = name;
+    //Mutator methods
+    public int getID()
+    {
+        return this.scoreId;
     }
 
-    public int getHighscore(){
-        return this._highscore;
+    public void setID(int id)
+    {
+        this.scoreId = id;
+    }
+
+    public String getName()
+    {
+        return this.playerName;
+    }
+
+    public void setName(String name)
+    {
+        this.playerName = name;
+    }
+
+    public int getHighscore()
+    {
+        return this.playerHighScore;
     }
 
     public void setHighscore(int highscore)
     {
-        this._highscore = highscore;
+        this.playerHighScore = highscore;
     }
 }

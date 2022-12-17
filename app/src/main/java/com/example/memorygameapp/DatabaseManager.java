@@ -4,7 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -101,5 +101,57 @@ public class DatabaseManager extends SQLiteOpenHelper
 
         // return count
         return count;
+    }
+    // code to get all contacts in a list view
+    public List<HighScore> getAllHighscore()
+    {
+        List<HighScore> highscoreList = new ArrayList<HighScore>();
+
+        // Select All Query
+        String selectQuery = "SELECT  * FROM " + TABLE_HIGHSCORE;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst())
+        {
+            do
+            {
+                HighScore highscore = new HighScore();
+                highscore.setID(Integer.parseInt(cursor.getString(0)));
+                highscore.setName(cursor.getString(1));
+                highscore.setHighscore(Integer.parseInt(cursor.getString(2)));
+                // Adding contact to list
+                highscoreList.add(highscore);
+            } while (cursor.moveToNext());
+        }
+
+        // return contact list
+        return highscoreList;
+    }
+
+    // code to get the single contact
+    HighScore getHighScoreWithID(int id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.query(TABLE_HIGHSCORE,
+                new String[]
+                {
+                    KEY_ID,
+                    KEY_NAME, KEY_HIGHSCORE
+                }, KEY_ID + "=?",
+                new String[]
+                {
+                    String.valueOf(id)
+                }, null, null, null, null);
+        if (cursor != null)
+            cursor.moveToFirst();
+
+        HighScore highscore = new HighScore(Integer.parseInt(cursor.getString(0)),
+                cursor.getString(1), Integer.parseInt(cursor.getString(2)));
+        // return contact
+        return highscore;
     }
 }
