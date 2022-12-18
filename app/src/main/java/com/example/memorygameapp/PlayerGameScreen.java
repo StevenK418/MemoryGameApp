@@ -37,7 +37,6 @@ public class PlayerGameScreen extends AppCompatActivity implements SensorEventLi
     // Floor
     private final double EAST_MOVE_BACKWARD = -7.0;
 
-
     private final int RED = 1;
     private final int YELLOW = 2;
     private final int GREEN = 3;
@@ -62,7 +61,6 @@ public class PlayerGameScreen extends AppCompatActivity implements SensorEventLi
         setContentView(R.layout.activity_player_game_screen);
         //Disable the top bar as it is not needed.
         getSupportActionBar ().hide ();
-
 
         //Database setup
         Context mContext = getApplicationContext();
@@ -342,37 +340,29 @@ public class PlayerGameScreen extends AppCompatActivity implements SensorEventLi
 
         String sensorsMessage = "X: " + x + " Y: " + y;
 
-        if(x > 0 && y > 0)
+        if ((x <= NORTH_MOVE_FORWARD && x < NORTH_MOVE_BACKWARD) && (highLimit == false))
         {
-            if ((x >= NORTH_MOVE_FORWARD && x > NORTH_MOVE_BACKWARD) && (highLimit == false))
-            {
-                highLimit = true;
-                doInput(findViewById(R.id.btnRed));
-                //btnRed.setText("@");
-            }
-            else if ((x <= NORTH_MOVE_BACKWARD && x < NORTH_MOVE_FORWARD) && (highLimit == true))
-            {
-                highLimit = false;
-                doInput(findViewById(R.id.btnGreen));
-                //btnGreen.setText("@");
-            }
-            // Can we get a side movement
-            // you need to do your own mag calculating
-            if ((y >= EAST_MOVE_FORWARD && y > EAST_MOVE_BACKWARD) && (highLimit == false))
-            {
-                highLimit = true;
-                doInput(findViewById(R.id.btnYellow));
-                //btnYellow.setText("@");
-                Log.d("FORWARD Sensor values: ", sensorsMessage);
-            }
-            else if ((y <= EAST_MOVE_BACKWARD && y < EAST_MOVE_FORWARD) && (highLimit == true))
-            {
-                highLimit = false;
-                doInput(findViewById(R.id.btnBlue));
-                //btnBlue.setText("@");
-                Log.d("BACKWARD Sensor values: ", sensorsMessage);
-            }
+            highLimit = true;
+            doInput(findViewById(R.id.btnRed));
         }
+        else if ((x >= NORTH_MOVE_BACKWARD && x > NORTH_MOVE_FORWARD) && (highLimit == true))
+        {
+            highLimit = false;
+            doInput(findViewById(R.id.btnGreen));
+        }
+        else if ((y >= EAST_MOVE_FORWARD && y > EAST_MOVE_BACKWARD) && (highLimit == true))
+        {
+            highLimit = false;
+            doInput(findViewById(R.id.btnYellow));
+            Log.d("FORWARD Sensor values: ", sensorsMessage);
+        }
+        else if ((y <= EAST_MOVE_BACKWARD && y < EAST_MOVE_FORWARD) && (highLimit == false))
+        {
+            highLimit = true;
+            doInput(findViewById(R.id.btnBlue));
+            Log.d("BACKWARD Sensor values: ", sensorsMessage);
+        }
+
     }
 
     @Override
