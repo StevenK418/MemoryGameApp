@@ -16,12 +16,12 @@ import android.content.Intent;
 public class MainActivity extends AppCompatActivity {
 
 
-    private final int BLUE = 1;
-    private final int RED = 2;
-    private final int YELLOW = 3;
-    private final int GREEN = 4;
+    private final int RED = 1;
+    private final int YELLOW = 2;
+    private final int GREEN = 3;
+    private final int BLUE = 4;
 
-    Button bRed, bBlue, bYellow, bGreen, activeButton;
+    Button btnRed, btnYellow, btnGreen, btnBlue, activeButton;
     int sequenceCount = 4, n = 0;
     private Object mutex = new Object();
     int[] gameSequence = new int[120];
@@ -46,10 +46,10 @@ public class MainActivity extends AppCompatActivity {
         //Database setup
         Context mContext = getApplicationContext();
 
-        bRed = findViewById(R.id.btnRed);
-        bBlue = findViewById(R.id.btnBlue);
-        bYellow = findViewById(R.id.btnYellow);
-        bGreen = findViewById(R.id.btnGreen);
+        btnRed = findViewById(R.id.btnRed);
+        btnYellow = findViewById(R.id.btnYellow);
+        btnGreen = findViewById(R.id.btnGreen);
+        btnBlue = findViewById(R.id.btnBlue);
 
         timeDisplay = findViewById(R.id.txt_Time);
 
@@ -80,20 +80,20 @@ public class MainActivity extends AppCompatActivity {
 
         switch (n) {
             case 1:
-                flashButton(bBlue);
-                gameSequence[counter++] = BLUE;
-                break;
-            case 2:
-                flashButton(bRed);
+                flashButton(btnRed);
                 gameSequence[counter++] = RED;
                 break;
-            case 3:
-                flashButton(bYellow);
+            case 2:
+                flashButton(btnYellow);
                 gameSequence[counter++] = YELLOW;
                 break;
-            case 4:
-                flashButton(bGreen);
+            case 3:
+                flashButton(btnGreen);
                 gameSequence[counter++] = GREEN;
+                break;
+            case 4:
+                flashButton(btnBlue);
+                gameSequence[counter++] = BLUE;
                 break;
             default:
                 break;

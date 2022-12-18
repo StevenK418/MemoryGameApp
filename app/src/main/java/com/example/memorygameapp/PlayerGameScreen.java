@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -75,13 +76,34 @@ public class PlayerGameScreen extends AppCompatActivity {
         return ((int) ((Math.random() * maxValue) + 1));
     }
 
-    private void oneButton()
+    public void doInput(View view)
     {
-        n = getRandom(sequenceCount);
+        ct.start();
 
-        Toast.makeText(this, "Number = " + n, Toast.LENGTH_SHORT).show();
+        int id = view.getId();
 
-        switch (n) {
+        switch(id)
+        {
+            case 1:
+                oneButton(1);
+                break;
+            case 2:
+                oneButton(2);
+                break;
+            case 3:
+                oneButton(3);
+                break;
+            case 4:
+                oneButton(4);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void oneButton(int buttonID)
+    {
+        switch (buttonID) {
             case 1:
                 flashButton(bBlue);
                 userGameSequence[counter++] = BLUE;
@@ -143,13 +165,25 @@ public class PlayerGameScreen extends AppCompatActivity {
         public void onFinish()
         {
 
-//            for (int i = 0; i< counter; i++)
-//            {
-//                Log.d("game sequence", String.valueOf(gameSequence[i]));
-//            }
+            for (int i = 0; i< counter; i++)
+            {
+                Log.d("ATTENTION:", "Entered the onFinishLoop");
+                Log.d("You entered: ", String.valueOf(userGameSequence[i]));
+                Log.d("game sequence", String.valueOf(gameSequence[i]));
+            }
 
-            //Check the sequence inpput against the one from the main activity
-            CheckPlayersInputSequence(userGameSequence);
+            //Check the sequence input against the one from the main activity
+
+            boolean result =  CheckPlayersInputSequence(userGameSequence);
+
+            if(result == true)
+            {
+                timeDisplay.setText("YOU WIN");
+            }
+            else
+            {
+                timeDisplay.setText("YOU LOSE!");
+            }
         }
     };
 
