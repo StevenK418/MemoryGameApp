@@ -21,10 +21,11 @@ public class MainActivity extends AppCompatActivity {
     private final int YELLOW = 3;
     private final int GREEN = 4;
 
-    Button bRed, bBlue, bYellow, bGreen, fb;
+    Button bRed, bBlue, bYellow, bGreen, activeButton;
     int sequenceCount = 4, n = 0;
     private Object mutex = new Object();
     int[] gameSequence = new int[120];
+    int[] userGameSequence = new int[120];
     int counter = 0;
 
     TextView timeDisplay;
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
     DatabaseManager dbManager;
 
+    boolean isCpuPlaying = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
         scoremanager = new ScoreManager(mContext);
         scoremanager.buildNewHighScore("TestUser", 1500);
         scoremanager.AddTestScoreData();
+
+
 
     }
 
@@ -98,23 +102,23 @@ public class MainActivity extends AppCompatActivity {
 
     private void flashButton(Button button)
     {
-        fb = button;
-        String buttonText = String.valueOf(fb.getText());
+        activeButton = button;
+        String buttonText = String.valueOf(activeButton.getText());
         Handler handler = new Handler();
         Runnable r = new Runnable()
         {
             public void run()
             {
-                fb.setPressed(true);
-                fb.invalidate();
-                fb.performClick();
+                activeButton.setPressed(true);
+                activeButton.invalidate();
+                activeButton.performClick();
                 Handler handler1 = new Handler();
                 Runnable r1 = new Runnable()
                 {
                     public void run()
                     {
-                        fb.setPressed(false);
-                        fb.invalidate();
+                        activeButton.setPressed(false);
+                        activeButton.invalidate();
                     }
                 };
                 handler1.postDelayed(r1, 600);
@@ -129,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
     {
         public void onTick(long millisUntilFinished)
         {
+            isCpuPlaying = true;
             timeDisplay.setText("seconds remaining: " + millisUntilFinished / 1500);
             oneButton();
             //here you can have your logic to set text to edittext
@@ -143,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
             {
                 Log.d("game sequence", String.valueOf(gameSequence[i]));
             }
+            isCpuPlaying = false;
 
             // start next activity
 
@@ -169,5 +175,50 @@ public class MainActivity extends AppCompatActivity {
 //        summaryPage.putExtra("time", time);
 //        //Load up the new activity
         startActivity(summaryPage);
+    }
+
+    /**
+     * Checks the sequence inputby the user matches
+     * the sequence shown
+     * @param userGameSequence
+     */
+    public boolean CheckPlayersInputSequence(int[] userGameSequence)
+    {
+        boolean doesMatch = false;
+        boolean[] results = new boolean[gameSequence.length];
+
+        for (int i = 0; i < gameSequence.length; i++) {
+            for (int j = 0; j < userGameSequence.length; j++) {
+                if (gameSequence[i] == userGameSequence[j]) {
+                    results[i] = true;
+                } else {
+                    results[i] = false;
+                }
+            }
+        }
+
+        for (int i = 0; i < results.length; i++)
+        {
+            if(results[i] == true)
+            {
+                doesMatch = true;
+                continue;
+            }
+            else
+            {
+                doesMatch=false;
+                break;
+            }
+        }
+        return doesMatch;
+    }
+
+    /**
+     * Adds the user's input to the game sequence
+     * @param input
+     */
+    public void RegisterInput(int input)
+    {
+        userGameSequence[counter++] = input;
     }
 }
