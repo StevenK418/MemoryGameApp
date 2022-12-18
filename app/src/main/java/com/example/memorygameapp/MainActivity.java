@@ -13,8 +13,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.content.Intent;
 
-public class MainActivity extends AppCompatActivity {
-
+public class MainActivity extends AppCompatActivity
+{
 
     private final int RED = 1;
     private final int YELLOW = 2;
@@ -30,12 +30,8 @@ public class MainActivity extends AppCompatActivity {
 
     TextView timeDisplay;
 
-
     ScoreManager scoremanager;
-
     DatabaseManager dbManager;
-
-    boolean isCpuPlaying = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,13 +49,10 @@ public class MainActivity extends AppCompatActivity {
 
         timeDisplay = findViewById(R.id.txt_Time);
 
-        //TODO: testing db
-        scoremanager = new ScoreManager(mContext);
-        scoremanager.buildNewHighScore("TestUser", 1500);
-        scoremanager.AddTestScoreData();
-
-
-
+//        //TODO: testing db
+//        scoremanager = new ScoreManager(mContext);
+//        scoremanager.buildNewHighScore("TestUser", 1500);
+//        scoremanager.AddTestScoreData();
     }
 
     public void doPlay(View view) {
@@ -133,7 +126,6 @@ public class MainActivity extends AppCompatActivity {
     {
         public void onTick(long millisUntilFinished)
         {
-            isCpuPlaying = true;
             timeDisplay.setText("seconds remaining: " + millisUntilFinished / 1500);
             oneButton();
             //here you can have your logic to set text to edittext
@@ -151,17 +143,6 @@ public class MainActivity extends AppCompatActivity {
 
             //Switch to the player Game screen
             switchToPlayerGameScreen();
-
-            // start next activity
-
-            // put the sequence into the next activity
-            // stack overglow https://stackoverflow.com/questions/3848148/sending-arrays-with-intent-putextra
-            //Intent i = new Intent(A.this, B.class);
-            //i.putExtra("numbers", array);
-            //startActivity(i);
-
-            // start the next activity
-            // int[] arrayB = extras.getIntArray("numbers");
         }
     };
 

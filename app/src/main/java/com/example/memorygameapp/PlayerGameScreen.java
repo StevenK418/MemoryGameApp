@@ -10,32 +10,27 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class PlayerGameScreen extends AppCompatActivity {
 
-    private final int BLUE = 1;
-    private final int RED = 2;
-    private final int YELLOW = 3;
-    private final int GREEN = 4;
+    private final int RED = 1;
+    private final int YELLOW = 2;
+    private final int GREEN = 3;
+    private final int BLUE = 4;
 
-    Button bRed, bBlue, bYellow, bGreen, activeButton;
+    Button btnRed, btnYellow, btnGreen, btnBlue, activeButton;
     int sequenceCount = 4, n = 0;
-    private Object mutex = new Object();
     int[] gameSequence = new int[120];
     int[] userGameSequence = new int[120];
     int counter = 0;
 
     TextView timeDisplay;
-
-
     ScoreManager scoremanager;
-
     DatabaseManager dbManager;
 
-    boolean isCpuPlaying = false;
+    boolean isTimeUp = false;
+    boolean isInPlay = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -47,23 +42,29 @@ public class PlayerGameScreen extends AppCompatActivity {
         //Database setup
         Context mContext = getApplicationContext();
 
-        bRed = findViewById(R.id.btnRed);
-        bBlue = findViewById(R.id.btnBlue);
-        bYellow = findViewById(R.id.btnYellow);
-        bGreen = findViewById(R.id.btnGreen);
+        btnRed = findViewById(R.id.btnRed);
+        btnYellow = findViewById(R.id.btnYellow);
+        btnGreen = findViewById(R.id.btnGreen);
+        btnBlue = findViewById(R.id.btnBlue);
 
         timeDisplay = findViewById(R.id.txt_Time);
 
-        //TODO: testing db
-        scoremanager = new ScoreManager(mContext);
-        scoremanager.buildNewHighScore("TestUser", 1500);
-        scoremanager.AddTestScoreData();
+//        //TODO: testing db
+//        scoremanager = new ScoreManager(mContext);
+//        scoremanager.buildNewHighScore("TestUser", 1500);
+//        scoremanager.AddTestScoreData();
 
         //Create new intent instance
         Intent intent = getIntent();
 
         //Get and store the gamesequence from the main activity
         gameSequence = intent.getIntArrayExtra("gameSequence");
+
+        for (int i=0;i < counter;i++)
+        {
+            Log.d("sequence", String.valueOf(gameSequence[i]));
+        }
+
     }
 
     public void doPlay(View view) {
@@ -78,47 +79,52 @@ public class PlayerGameScreen extends AppCompatActivity {
 
     public void doInput(View view)
     {
-        ct.start();
+            if(isInPlay == false)
+            {
+                ct.start();
+                isInPlay = true;
+            }
 
-        int id = view.getId();
 
-        switch(id)
-        {
-            case 1:
-                oneButton(1);
-                break;
-            case 2:
-                oneButton(2);
-                break;
-            case 3:
-                oneButton(3);
-                break;
-            case 4:
-                oneButton(4);
-                break;
-            default:
-                break;
-        }
+            int id = view.getId();
+
+            switch(id)
+            {
+                case 1:
+                    oneButton(1);
+                    break;
+                case 2:
+                    oneButton(2);
+                    break;
+                case 3:
+                    oneButton(3);
+                    break;
+                case 4:
+                    oneButton(4);
+                    break;
+                default:
+                    break;
+            }
     }
 
     private void oneButton(int buttonID)
     {
         switch (buttonID) {
             case 1:
-                flashButton(bBlue);
-                userGameSequence[counter++] = BLUE;
-                break;
-            case 2:
-                flashButton(bRed);
+                flashButton(btnYellow);
                 userGameSequence[counter++] = RED;
                 break;
-            case 3:
-                flashButton(bYellow);
+            case 2:
+                flashButton(btnRed);
                 userGameSequence[counter++] = YELLOW;
                 break;
-            case 4:
-                flashButton(bGreen);
+            case 3:
+                flashButton(btnGreen);
                 userGameSequence[counter++] = GREEN;
+                break;
+            case 4:
+                flashButton(btnBlue);
+                userGameSequence[counter++] = BLUE;
                 break;
             default:
                 break;
@@ -158,22 +164,37 @@ public class PlayerGameScreen extends AppCompatActivity {
     {
         public void onTick(long millisUntilFinished)
         {
-            isCpuPlaying = true;
             timeDisplay.setText("seconds remaining: " + millisUntilFinished / 1500);
         }
 
         public void onFinish()
         {
+            timeDisplay.setText("TIME'S UP!");
+            PrintResult();
+            isTimeUp = true;
+            isInPlay = false;
+        }
+    };
 
-            for (int i = 0; i< counter; i++)
-            {
-                Log.d("ATTENTION:", "Entered the onFinishLoop");
-                Log.d("You entered: ", String.valueOf(userGameSequence[i]));
-                Log.d("game sequence", String.valueOf(gameSequence[i]));
-            }
+    public void doHighScoreTable(View view)
+    {
+        //Create new intent instance for the high score table
+        Intent summaryPage = new Intent(this, HighScoreTable.class);
+        startActivity(summaryPage);
+    }
 
-            //Check the sequence input against the one from the main activity
+    public void PrintResult()
+    {
 
+        for (int i = 0; i< userGameSequence.length; i++)
+        {
+            Log.d("ATTENTION:", "Entered the onFinishLoop");
+            Log.d("You entered: ", String.valueOf(userGameSequence[i]));
+            Log.d("game sequence", String.valueOf(gameSequence[i]));
+            timeDisplay.setText("Entered the For loop in onFinish");
+        }
+
+        //Check the sequence input against the one from the main activity
             boolean result =  CheckPlayersInputSequence(userGameSequence);
 
             if(result == true)
@@ -184,14 +205,6 @@ public class PlayerGameScreen extends AppCompatActivity {
             {
                 timeDisplay.setText("YOU LOSE!");
             }
-        }
-    };
-
-    public void doHighScoreTable(View view)
-    {
-        //Create new intent instance for the high score table
-        Intent summaryPage = new Intent(this, HighScoreTable.class);
-        startActivity(summaryPage);
     }
 
     /**
