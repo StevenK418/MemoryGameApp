@@ -15,8 +15,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class PlayerGameScreen extends AppCompatActivity implements SensorEventListener{
-
+public class PlayerGameScreen extends AppCompatActivity implements SensorEventListener
+{
+    //Create a new soundManager Instance
+    SoundManager soundManager = new SoundManager(1.0f, PlayerGameScreen.this);
 
     //Configure  the sensor inputs
     private SensorManager sensorManager;
@@ -34,7 +36,6 @@ public class PlayerGameScreen extends AppCompatActivity implements SensorEventLi
     private final double EAST_MOVE_FORWARD = 8.0;
     // Floor
     private final double EAST_MOVE_BACKWARD = -7.0;
-
 
 
     private final int RED = 1;
@@ -59,7 +60,9 @@ public class PlayerGameScreen extends AppCompatActivity implements SensorEventLi
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player_game_screen);
+        //Disable the top bar as it is not needed.
         getSupportActionBar ().hide ();
+
 
         //Database setup
         Context mContext = getApplicationContext();
@@ -127,20 +130,22 @@ public class PlayerGameScreen extends AppCompatActivity implements SensorEventLi
 
     private void oneButton(int buttonID)
     {
-
-        Log.d("TiltPressed:", String.valueOf(buttonID));
         switch (buttonID) {
             case 1:
                 userGameSequence[counter] = RED;
+                soundManager.PlaySound(1);
                 break;
             case 2:
                 userGameSequence[counter] = YELLOW;
+                soundManager.PlaySound(2);
                 break;
             case 3:
                 userGameSequence[counter] = GREEN;
+                soundManager.PlaySound(3);
                 break;
             case 4:
                 userGameSequence[counter] = BLUE;
+                soundManager.PlaySound(4);
                 break;
             default:
                 break;
@@ -261,6 +266,8 @@ public class PlayerGameScreen extends AppCompatActivity implements SensorEventLi
         {
             //Display the end game condition to the user
             timeDisplay.setText("YOU WIN ROUND");
+            //Play the win sound
+            soundManager.PlayWinSound();
             //Switch back to the main game screen
             //switchBackToMainScreen();
         }
@@ -268,6 +275,8 @@ public class PlayerGameScreen extends AppCompatActivity implements SensorEventLi
         {
             //Display the end game condition back to the user
             timeDisplay.setText("YOU LOSE!");
+            //Play the lose sound
+            soundManager.PlayLoseSound();
             //Switch to the high score screen instead
             //switchBackToHighScoreScreen();
         }
@@ -321,50 +330,48 @@ public class PlayerGameScreen extends AppCompatActivity implements SensorEventLi
     @Override
     public void onSensorChanged(SensorEvent event)
     {
-
         //Failsafe, return if no sensors have been found
         if (event.sensor != sensor)
         {
             return;
         }
 
+        //Store our x and Y axes
         float x = event.values[0];
         float y = event.values[1];
 
         String sensorsMessage = "X: " + x + " Y: " + y;
 
-        if ((x >= NORTH_MOVE_FORWARD && x > NORTH_MOVE_BACKWARD) && (highLimit == false))
+        if(x > 0 && y > 0)
         {
-            highLimit = true;
-            doInput(findViewById(R.id.btnRed));
-            btnRed.setText("@");
-            Log.d("FORWARD Sensor values: ", sensorsMessage);
-
-        }
-        else if ((x <= NORTH_MOVE_BACKWARD && x < NORTH_MOVE_FORWARD) && (highLimit == true))
-        {
-            highLimit = false;
-            doInput(findViewById(R.id.btnGreen));
-            btnGreen.setText("@");
-            Log.d("BACKWARD Sensor values: ", sensorsMessage);
-        }
-
-        // Can we get a side movement
-        // you need to do your own mag calculating
-        if ((y >= EAST_MOVE_FORWARD && y > EAST_MOVE_BACKWARD) && (highLimit == false))
-        {
-            highLimit = true;
-            doInput(findViewById(R.id.btnYellow));
-            btnYellow.setText("@");
-            Log.d("FORWARD Sensor values: ", sensorsMessage);
-
-        }
-        else if ((y <= EAST_MOVE_BACKWARD && y < EAST_MOVE_FORWARD) && (highLimit == true))
-        {
-            highLimit = false;
-            doInput(findViewById(R.id.btnBlue));
-            btnBlue.setText("@");
-            Log.d("BACKWARD Sensor values: ", sensorsMessage);
+            if ((x >= NORTH_MOVE_FORWARD && x > NORTH_MOVE_BACKWARD) && (highLimit == false))
+            {
+                highLimit = true;
+                doInput(findViewById(R.id.btnRed));
+                //btnRed.setText("@");
+            }
+            else if ((x <= NORTH_MOVE_BACKWARD && x < NORTH_MOVE_FORWARD) && (highLimit == true))
+            {
+                highLimit = false;
+                doInput(findViewById(R.id.btnGreen));
+                //btnGreen.setText("@");
+            }
+            // Can we get a side movement
+            // you need to do your own mag calculating
+            if ((y >= EAST_MOVE_FORWARD && y > EAST_MOVE_BACKWARD) && (highLimit == false))
+            {
+                highLimit = true;
+                doInput(findViewById(R.id.btnYellow));
+                //btnYellow.setText("@");
+                Log.d("FORWARD Sensor values: ", sensorsMessage);
+            }
+            else if ((y <= EAST_MOVE_BACKWARD && y < EAST_MOVE_FORWARD) && (highLimit == true))
+            {
+                highLimit = false;
+                doInput(findViewById(R.id.btnBlue));
+                //btnBlue.setText("@");
+                Log.d("BACKWARD Sensor values: ", sensorsMessage);
+            }
         }
     }
 

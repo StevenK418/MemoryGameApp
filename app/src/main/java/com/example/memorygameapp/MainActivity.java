@@ -3,6 +3,7 @@ package com.example.memorygameapp;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -15,6 +16,8 @@ import android.content.Intent;
 
 public class MainActivity extends AppCompatActivity
 {
+    //Create a new soundManager Instance
+    SoundManager soundManager = new SoundManager(1.0f, MainActivity.this);
 
     private final int RED = 1;
     private final int YELLOW = 2;
@@ -75,18 +78,22 @@ public class MainActivity extends AppCompatActivity
             case 1:
                 flashButton(btnRed);
                 gameSequence[counter++] = RED;
+                soundManager.PlaySound(1);
                 break;
             case 2:
                 flashButton(btnYellow);
                 gameSequence[counter++] = YELLOW;
+                soundManager.PlaySound(2);
                 break;
             case 3:
                 flashButton(btnGreen);
                 gameSequence[counter++] = GREEN;
+                soundManager.PlaySound(3);
                 break;
             case 4:
                 flashButton(btnBlue);
                 gameSequence[counter++] = BLUE;
+                soundManager.PlaySound(4);
                 break;
             default:
                 break;
