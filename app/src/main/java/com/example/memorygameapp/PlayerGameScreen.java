@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import java.util.ArrayList;
 
 public class PlayerGameScreen extends AppCompatActivity implements SensorEventListener
 {
@@ -43,7 +44,9 @@ public class PlayerGameScreen extends AppCompatActivity implements SensorEventLi
     private final int BLUE = 4;
 
     Button btnRed, btnYellow, btnGreen, btnBlue, activeButton;
-    int[] gameSequence = new int[120];
+    //int[] gameSequence = new int[120];
+
+    ArrayList<Integer> gameSequence = new ArrayList<>();
     int[] userGameSequence = new int[120];
     int counter = 0;
 
@@ -81,11 +84,12 @@ public class PlayerGameScreen extends AppCompatActivity implements SensorEventLi
         Intent intent = getIntent();
 
         //Get and store the game sequence from the main activity
-        gameSequence = intent.getIntArrayExtra("gameSequence");
+        //gameSequence = intent.getIntArrayExtra("gameSequence");
+        gameSequence = intent.getIntegerArrayListExtra("gameSequence");
 
         for (int i=0;i < counter;i++)
         {
-            Log.d("sequence", String.valueOf(gameSequence[i]));
+            Log.d("sequence", String.valueOf(gameSequence.get(i)));
         }
 
         //Initialize our sensors
@@ -192,7 +196,7 @@ public class PlayerGameScreen extends AppCompatActivity implements SensorEventLi
         for (int i = 0; i< userGameSequence.length; i++)
         {
             //Build string based on the input and the sequence value passed
-            String message = "You entered: " + String.valueOf(userGameSequence[i]) + " And Sequence was: " + String.valueOf(gameSequence[i]);
+            String message = "You entered: " + String.valueOf(userGameSequence[i]) + " And Sequence was: " + String.valueOf(gameSequence.get(i));
             //Display this result in the Logcat result
             Log.d("GameInfo: ", message);
         }
@@ -209,13 +213,13 @@ public class PlayerGameScreen extends AppCompatActivity implements SensorEventLi
         boolean doesMatch = true;
 
         //Array to store boolean results during check
-        boolean[] results = new boolean[gameSequence.length];
+        boolean[] results = new boolean[gameSequence.size()];
 
         //Iterate through the game sequence and check against user input
-        for (int i = 0; i < gameSequence.length; i++)
+        for (int i = 0; i < gameSequence.size(); i++)
         {
             //If user's input matches index, store True, else false
-            if (gameSequence[i] == userGameSequence[i])
+            if (gameSequence.get(i) == userGameSequence[i])
             {
                 results[i] = true;
             }
@@ -287,6 +291,9 @@ public class PlayerGameScreen extends AppCompatActivity implements SensorEventLi
     {
         //Create new intent instance for the high score table
         Intent mainGameScreen = new Intent(this, MainActivity.class);
+        //Pass back the game sequence to the mainscreen again
+        mainGameScreen.putIntegerArrayListExtra("gameSequence", gameSequence);
+        //Start the mainscreen activity once more
         startActivity(mainGameScreen);
     }
 
