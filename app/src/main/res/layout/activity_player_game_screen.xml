@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
-    tools:context=".MainActivity">
+    tools:context=".PlayerGameScreen">
 
     <TextView
         android:id="@+id/txt_Time"
@@ -104,7 +103,7 @@
         android:layout_height="100dp"
         android:background="@drawable/roundbtn"
         android:backgroundTint="@color/Green"
-        android:onClick="doPlay"
+        android:onClick="doHighScoreTable"
         android:text="PLAY"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guideline2"

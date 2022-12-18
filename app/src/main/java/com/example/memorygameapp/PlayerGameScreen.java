@@ -3,6 +3,7 @@ package com.example.memorygameapp;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -11,10 +12,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.content.Intent;
 
-public class MainActivity extends AppCompatActivity {
-
+public class PlayerGameScreen extends AppCompatActivity {
 
     private final int BLUE = 1;
     private final int RED = 2;
@@ -38,9 +37,10 @@ public class MainActivity extends AppCompatActivity {
     boolean isCpuPlaying = false;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_player_game_screen);
         getSupportActionBar ().hide ();
 
         //Database setup
@@ -58,8 +58,11 @@ public class MainActivity extends AppCompatActivity {
         scoremanager.buildNewHighScore("TestUser", 1500);
         scoremanager.AddTestScoreData();
 
+        //Create new intent instance
+        Intent intent = getIntent();
 
-
+        //Get and store the gamesequence from the main activity
+        gameSequence = intent.getIntArrayExtra("gameSequence");
     }
 
     public void doPlay(View view) {
@@ -81,19 +84,19 @@ public class MainActivity extends AppCompatActivity {
         switch (n) {
             case 1:
                 flashButton(bBlue);
-                gameSequence[counter++] = BLUE;
+                userGameSequence[counter++] = BLUE;
                 break;
             case 2:
                 flashButton(bRed);
-                gameSequence[counter++] = RED;
+                userGameSequence[counter++] = RED;
                 break;
             case 3:
                 flashButton(bYellow);
-                gameSequence[counter++] = YELLOW;
+                userGameSequence[counter++] = YELLOW;
                 break;
             case 4:
                 flashButton(bGreen);
-                gameSequence[counter++] = GREEN;
+                userGameSequence[counter++] = GREEN;
                 break;
             default:
                 break;
@@ -135,43 +138,20 @@ public class MainActivity extends AppCompatActivity {
         {
             isCpuPlaying = true;
             timeDisplay.setText("seconds remaining: " + millisUntilFinished / 1500);
-            oneButton();
-            //here you can have your logic to set text to edittext
         }
 
         public void onFinish()
         {
-            //mTextField.setText("done!");
-            // we now have the game sequence
 
-            for (int i = 0; i< counter; i++)
-            {
-                Log.d("game sequence", String.valueOf(gameSequence[i]));
-            }
+//            for (int i = 0; i< counter; i++)
+//            {
+//                Log.d("game sequence", String.valueOf(gameSequence[i]));
+//            }
 
-            //Switch to the player Game screen
-            switchToPlayerGameScreen();
-
-            // start next activity
-
-            // put the sequence into the next activity
-            // stack overglow https://stackoverflow.com/questions/3848148/sending-arrays-with-intent-putextra
-            //Intent i = new Intent(A.this, B.class);
-            //i.putExtra("numbers", array);
-            //startActivity(i);
-
-            // start the next activity
-            // int[] arrayB = extras.getIntArray("numbers");
+            //Check the sequence inpput against the one from the main activity
+            CheckPlayersInputSequence(userGameSequence);
         }
     };
-
-    public void switchToPlayerGameScreen()
-    {
-        //Create new intent instance for the high score table
-        Intent playerGameScreen = new Intent(this, PlayerGameScreen.class);
-        playerGameScreen.putExtra("gameSequence", gameSequence);
-        startActivity(playerGameScreen);
-    }
 
     public void doHighScoreTable(View view)
     {
