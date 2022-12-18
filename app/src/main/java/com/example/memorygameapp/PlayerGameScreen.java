@@ -20,7 +20,6 @@ public class PlayerGameScreen extends AppCompatActivity {
     private final int BLUE = 4;
 
     Button btnRed, btnYellow, btnGreen, btnBlue, activeButton;
-    int sequenceCount = 4, n = 0;
     int[] gameSequence = new int[120];
     int[] userGameSequence = new int[120];
     int counter = 0;
@@ -57,7 +56,7 @@ public class PlayerGameScreen extends AppCompatActivity {
         //Create new intent instance
         Intent intent = getIntent();
 
-        //Get and store the gamesequence from the main activity
+        //Get and store the game sequence from the main activity
         gameSequence = intent.getIntArrayExtra("gameSequence");
 
         for (int i=0;i < counter;i++)
@@ -79,27 +78,28 @@ public class PlayerGameScreen extends AppCompatActivity {
 
     public void doInput(View view)
     {
+            //Check if the game is in play and only start timer if it is not
             if(isInPlay == false)
             {
                 ct.start();
-                isInPlay = true;
             }
 
+            //Get the full id nof the button that was pressed
+            String elementName = view.getResources().getResourceName(view.getId());
 
-            int id = view.getId();
-
-            switch(id)
+            //Check the value of the Button's id and pass the correct value to the onebutton method
+            switch(elementName)
             {
-                case 1:
+                case "com.example.memorygameapp:id/btnRed":
                     oneButton(1);
                     break;
-                case 2:
+                case "com.example.memorygameapp:id/btnYellow":
                     oneButton(2);
                     break;
-                case 3:
+                case "com.example.memorygameapp:id/btnGreen":
                     oneButton(3);
                     break;
-                case 4:
+                case "com.example.memorygameapp:id/btnBlue":
                     oneButton(4);
                     break;
                 default:
@@ -111,59 +111,41 @@ public class PlayerGameScreen extends AppCompatActivity {
     {
         switch (buttonID) {
             case 1:
-                flashButton(btnYellow);
-                userGameSequence[counter++] = RED;
+                userGameSequence[counter] = RED;
                 break;
             case 2:
-                flashButton(btnRed);
-                userGameSequence[counter++] = YELLOW;
+                userGameSequence[counter] = YELLOW;
                 break;
             case 3:
-                flashButton(btnGreen);
-                userGameSequence[counter++] = GREEN;
+                userGameSequence[counter] = GREEN;
                 break;
             case 4:
-                flashButton(btnBlue);
-                userGameSequence[counter++] = BLUE;
+                userGameSequence[counter] = BLUE;
                 break;
             default:
                 break;
         }   // end switch
+        //Increment the counter by 1 each run of the method
+        counter++;
     }
 
     private void flashButton(Button button)
     {
         activeButton = button;
-        String buttonText = String.valueOf(activeButton.getText());
-        Handler handler = new Handler();
-        Runnable r = new Runnable()
-        {
-            public void run()
-            {
-                activeButton.setPressed(true);
-                activeButton.invalidate();
-                activeButton.performClick();
-                Handler handler1 = new Handler();
-                Runnable r1 = new Runnable()
-                {
-                    public void run()
-                    {
-                        activeButton.setPressed(false);
-                        activeButton.invalidate();
-                    }
-                };
-                handler1.postDelayed(r1, 600);
-
-            } // end runnable
-        };
-        handler.postDelayed(r, 600);
+        activeButton.setPressed(true);
+        activeButton.invalidate();
+        activeButton.performClick();
     }
 
-    /*Timer*/
+    /**
+     * Count down game timer
+     */
     CountDownTimer ct = new CountDownTimer(6000,  1500)
     {
+
         public void onTick(long millisUntilFinished)
         {
+            isInPlay = true;
             timeDisplay.setText("seconds remaining: " + millisUntilFinished / 1500);
         }
 
@@ -173,65 +155,62 @@ public class PlayerGameScreen extends AppCompatActivity {
             PrintResult();
             isTimeUp = true;
             isInPlay = false;
+            //Show the result of the game based on the user's input
+            ShowGameResult(userGameSequence);
         }
     };
 
-    public void doHighScoreTable(View view)
-    {
-        //Create new intent instance for the high score table
-        Intent summaryPage = new Intent(this, HighScoreTable.class);
-        startActivity(summaryPage);
-    }
 
+    /**
+     * Prints the results back to the user via logcat
+     */
     public void PrintResult()
     {
-
         for (int i = 0; i< userGameSequence.length; i++)
         {
-            Log.d("ATTENTION:", "Entered the onFinishLoop");
-            Log.d("You entered: ", String.valueOf(userGameSequence[i]));
-            Log.d("game sequence", String.valueOf(gameSequence[i]));
-            timeDisplay.setText("Entered the For loop in onFinish");
+            //Build string based on the input and the sequence value passed
+            String message = "You entered: " + String.valueOf(userGameSequence[i]) + " And Sequence was: " + String.valueOf(gameSequence[i]);
+            //Display this result in the Logcat result
+            Log.d("GameInfo: ", message);
         }
-
-        //Check the sequence input against the one from the main activity
-            boolean result =  CheckPlayersInputSequence(userGameSequence);
-
-            if(result == true)
-            {
-                timeDisplay.setText("YOU WIN");
-            }
-            else
-            {
-                timeDisplay.setText("YOU LOSE!");
-            }
     }
 
     /**
-     * Checks the sequence inputby the user matches
+     * Checks the sequence input by the user matches
      * the sequence shown
      * @param userGameSequence
      */
     public boolean CheckPlayersInputSequence(int[] userGameSequence)
     {
-        boolean doesMatch = false;
+        //Flag set to true by default unless false detected
+        boolean doesMatch = true;
+
+        //Array to store boolean results during check
         boolean[] results = new boolean[gameSequence.length];
 
-        for (int i = 0; i < gameSequence.length; i++) {
-            for (int j = 0; j < userGameSequence.length; j++) {
-                if (gameSequence[i] == userGameSequence[j]) {
-                    results[i] = true;
-                } else {
-                    results[i] = false;
-                }
+        //Iterate through the game sequence and check against user input
+        for (int i = 0; i < gameSequence.length; i++)
+        {
+            //If user's input matches index, store True, else false
+            if (gameSequence[i] == userGameSequence[i])
+            {
+                results[i] = true;
+            }
+            else
+            {
+                results[i] = false;
             }
         }
 
+        /**
+         * For all results in results, if one or more False's
+         * are detected, set the doesmatch flag to false
+         */
         for (int i = 0; i < results.length; i++)
         {
+            Log.d("RESULT", String.valueOf((results[i])));
             if(results[i] == true)
             {
-                doesMatch = true;
                 continue;
             }
             else
@@ -240,15 +219,77 @@ public class PlayerGameScreen extends AppCompatActivity {
                 break;
             }
         }
+        //Return the end result
         return doesMatch;
     }
 
     /**
-     * Adds the user's input to the game sequence
-     * @param input
+     * Shows the End game condition and acts accordingly
+     * @param userGameSequence
      */
-    public void RegisterInput(int input)
+
+    public void ShowGameResult(int[] userGameSequence)
     {
-        userGameSequence[counter++] = input;
+
+        //Reset the values
+        ResetGame();
+
+        //Check the sequence input against the one from the main activity
+        boolean result =  CheckPlayersInputSequence(userGameSequence);
+
+        if(result == true)
+        {
+            //Display the end game condition to the user
+            timeDisplay.setText("YOU WIN ROUND");
+            //Switch back to the main game screen
+            switchBackToMainScreen();
+        }
+        else
+        {
+            //Display the end game condition back to the user
+            timeDisplay.setText("YOU LOSE!");
+            //Switch to the high score screen instead
+            switchBackToHighScoreScreen();
+        }
+    }
+
+    /**
+     * Switches back to the main screen for a new round
+     */
+    public void switchBackToMainScreen()
+    {
+        //Create new intent instance for the high score table
+        Intent mainGameScreen = new Intent(this, MainActivity.class);
+        startActivity(mainGameScreen);
+    }
+
+    /**
+     * Switches to the highscore results screen
+     */
+    public void switchBackToHighScoreScreen()
+    {
+        //Create new intent instance for the high score table
+        Intent highScoreScreen = new Intent(this, HighScoreTable.class);
+        startActivity(highScoreScreen);
+    }
+
+    /**
+     * Resets all the sequence values and the displayed text for a new round
+     */
+    public void ResetGame()
+    {
+        //Iterate through the user's inputs and set to zero
+        for (int i : userGameSequence)
+        {
+            i=0;
+        }
+
+        //Iterate through the game sequence's inputs and reset to zero
+        for (int j : gameSequence)
+        {
+            j=0;
+        }
+
+        timeDisplay.setText("Player's turn!");
     }
 }
