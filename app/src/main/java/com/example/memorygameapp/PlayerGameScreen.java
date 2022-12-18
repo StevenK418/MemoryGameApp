@@ -6,13 +6,36 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Handler;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class PlayerGameScreen extends AppCompatActivity {
+public class PlayerGameScreen extends AppCompatActivity implements SensorEventListener{
+
+
+    //Configure  the sensor inputs
+    private SensorManager sensorManager;
+    private Sensor sensor;
+    boolean highLimit = false;
+
+    //Predefine floor and ceiling on x axis (forward and backwards)
+    // Ceiling
+    private final double NORTH_MOVE_FORWARD = -7.0;
+    // Floor
+    private final double NORTH_MOVE_BACKWARD = 8.0;
+
+    //Predefine floor and ceiling on y axis (sideways)
+    // Ceiling
+    private final double EAST_MOVE_FORWARD = 8.0;
+    // Floor
+    private final double EAST_MOVE_BACKWARD = -7.0;
+
+
 
     private final int RED = 1;
     private final int YELLOW = 2;
@@ -64,16 +87,11 @@ public class PlayerGameScreen extends AppCompatActivity {
             Log.d("sequence", String.valueOf(gameSequence[i]));
         }
 
-    }
+        //Initialize our sensors
+        // we are going to use the sensor service
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
-    public void doPlay(View view) {
-        ct.start();
-    }
-
-    // return a number between 1 and maxValue
-    private int getRandom(int maxValue)
-    {
-        return ((int) ((Math.random() * maxValue) + 1));
     }
 
     public void doInput(View view)
@@ -109,6 +127,8 @@ public class PlayerGameScreen extends AppCompatActivity {
 
     private void oneButton(int buttonID)
     {
+
+        Log.d("TiltPressed:", String.valueOf(buttonID));
         switch (buttonID) {
             case 1:
                 userGameSequence[counter] = RED;
@@ -242,14 +262,14 @@ public class PlayerGameScreen extends AppCompatActivity {
             //Display the end game condition to the user
             timeDisplay.setText("YOU WIN ROUND");
             //Switch back to the main game screen
-            switchBackToMainScreen();
+            //switchBackToMainScreen();
         }
         else
         {
             //Display the end game condition back to the user
             timeDisplay.setText("YOU LOSE!");
             //Switch to the high score screen instead
-            switchBackToHighScoreScreen();
+            //switchBackToHighScoreScreen();
         }
     }
 
@@ -292,4 +312,97 @@ public class PlayerGameScreen extends AppCompatActivity {
 
         timeDisplay.setText("Player's turn!");
     }
+
+    // regionSensor management
+    /**
+     * Main sensor event detection
+     * @param event
+     */
+    @Override
+    public void onSensorChanged(SensorEvent event)
+    {
+
+        //Failsafe, return if no sensors have been found
+        if (event.sensor != sensor)
+        {
+            return;
+        }
+
+        float x = event.values[0];
+        float y = event.values[1];
+
+        String sensorsMessage = "X: " + x + " Y: " + y;
+
+        if ((x >= NORTH_MOVE_FORWARD && x > NORTH_MOVE_BACKWARD) && (highLimit == false))
+        {
+            highLimit = true;
+            doInput(findViewById(R.id.btnRed));
+            btnRed.setText("@");
+            Log.d("FORWARD Sensor values: ", sensorsMessage);
+
+        }
+        else if ((x <= NORTH_MOVE_BACKWARD && x < NORTH_MOVE_FORWARD) && (highLimit == true))
+        {
+            highLimit = false;
+            doInput(findViewById(R.id.btnGreen));
+            btnGreen.setText("@");
+            Log.d("BACKWARD Sensor values: ", sensorsMessage);
+        }
+
+        // Can we get a side movement
+        // you need to do your own mag calculating
+        if ((y >= EAST_MOVE_FORWARD && y > EAST_MOVE_BACKWARD) && (highLimit == false))
+        {
+            highLimit = true;
+            doInput(findViewById(R.id.btnYellow));
+            btnYellow.setText("@");
+            Log.d("FORWARD Sensor values: ", sensorsMessage);
+
+        }
+        else if ((y <= EAST_MOVE_BACKWARD && y < EAST_MOVE_FORWARD) && (highLimit == true))
+        {
+            highLimit = false;
+            doInput(findViewById(R.id.btnBlue));
+            btnBlue.setText("@");
+            Log.d("BACKWARD Sensor values: ", sensorsMessage);
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+
+    /**
+     * When the app is brought to the foreground - using app on screen
+     */
+    protected void onResume()
+    {
+        super.onResume();
+        // turn on the sensor
+        sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    /**
+     * App running but not on screen - in the background
+     */
+    protected void onPause()
+    {
+        super.onPause();
+        //Switch off the sensor to save energy
+        sensorManager.unregisterListener(this);
+    }
+
+    /**
+     * Do some rounding of the mag value
+     */
+    public static double round(double value, int places)
+    {
+        if (places < 0) throw new IllegalArgumentException();
+        long factor = (long) Math.pow(10, places);
+        value = value * factor;
+        long tmp = Math.round(value);
+        return (double) tmp / factor;
+    }
+
+    //endregion
+
 }
