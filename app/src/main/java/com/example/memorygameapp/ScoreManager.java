@@ -1,9 +1,7 @@
 package com.example.memorygameapp;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -73,7 +71,7 @@ public class ScoreManager extends AppCompatActivity
     public static void DisplayScores()
     {
         //Get and store all the records in the db:
-        highscores = db.getAllHighscore();
+        highscores = db.getHighScores();
 
         if(highscores != null)
         {
@@ -103,24 +101,24 @@ public class ScoreManager extends AppCompatActivity
      */
     public static boolean CheckIfHighScore()
     {
-        List<HighScore> userScores = db.getAllHighscore();
+        List<HighScore> userScores = db.GetTopFiveScores();
         boolean result = true;
 
-//        if(userScores != null)
-//        {
-//            for(HighScore score : userScores)
-//            {
-//                if(userScore > score.getHighscore())
-//                {
-//                    result = true;
-//                    break;
-//                }
-//            }
-//        }
-//        else{
-//            result = true;
-//        }
-
+        if(userScores != null)
+        {
+            for(HighScore score : userScores)
+            {
+                if(userScore > score.getHighscore())
+                {
+                    result = true;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            result = true;
+        }
         return result;
     }
 

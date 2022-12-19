@@ -168,7 +168,7 @@ public class PlayerGameScreen extends AppCompatActivity implements SensorEventLi
         public void onTick(long millisUntilFinished)
         {
             isInPlay = true;
-            timeDisplay.setText("seconds remaining: " + millisUntilFinished / 1500);
+            timeDisplay.setText("Time Left: " + millisUntilFinished / 1500);
         }
 
         public void onFinish()

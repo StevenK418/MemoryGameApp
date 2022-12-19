@@ -18,6 +18,7 @@ public class NewHighScore extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_high_score);
+        getSupportActionBar ().hide ();
 
         scoreValue = findViewById(R.id.txtScoreValue);
         name = findViewById(R.id.txtName);

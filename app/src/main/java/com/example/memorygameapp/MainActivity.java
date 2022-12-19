@@ -146,7 +146,7 @@ public class MainActivity extends AppCompatActivity
     {
         public void onTick(long millisUntilFinished)
         {
-            timeDisplay.setText("seconds remaining: " + millisUntilFinished / 1500);
+            timeDisplay.setText("Time Left: " + millisUntilFinished / 1500);
             n = gameSequence[counter];
             oneButton(n);
         }

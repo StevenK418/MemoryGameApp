@@ -1,8 +1,7 @@
 package com.example.memorygameapp;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.ListActivity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -20,34 +19,21 @@ public class HighScoreTable extends ListActivity {
         db = new DatabaseManager(this.getApplicationContext());
         // use the SimpleCursorAdapter to show the
         // elements in a ListView
-        List<HighScore> values = db.getAllHighscore();
+        //Get the top five scorers and display
+        List<HighScore> values = db.GetTopFiveScores();
 
         ArrayAdapter<HighScore> adapter = new ArrayAdapter<HighScore>(this,
                 android.R.layout.simple_list_item_1, values);
         setListAdapter(adapter);
     }
 
-//    // Will be called via the onClick attribute
-//    // of the buttons in main.xml
-//    public void onClick(View view) {
-//        @SuppressWarnings("unchecked")
-//        ArrayAdapter<HighScore> adapter = (ArrayAdapter<HighScore>) getListAdapter();
-//        HighScore highscore = null;
-//        switch (view.getId()) {
-//            case R.id.add:
-//                String inStr = userText.getText().toString();
-//                // save the new comment to the database
-//                HighScore = datasource.createComment(inStr);
-//                adapter.add(comment);
-//                break;
-//            case R.id.delete:
-//                if (getListAdapter().getCount() > 0) {
-//                    comment = (Comment) getListAdapter().getItem(0);
-//                    datasource.deleteComment(comment);
-//                    adapter.remove(comment);
-//                }
-//                break;
-//        }
-//        adapter.notifyDataSetChanged();
-//    }
+    /**
+     * Onclick event to return to the mainscreen
+     * @param view
+     */
+    public void doReturnToMain(View view)
+    {
+        Intent mainScreen = new Intent(this, MainActivity.class);
+        startActivity(mainScreen);
+    }
 }
