@@ -262,11 +262,28 @@ public class PlayerGameScreen extends AppCompatActivity implements SensorEventLi
         boolean isHighScore = ScoreManager.CheckIfHighScore();
         Log.d("IsHighScore is: ", String.valueOf(isHighScore));
 
-        if(isHighScore && result == true)
+       if(result == true && isHighScore == true && ScoreManager.round == 2)
         {
-            //Show the new high score screen
+            //Display the end game condition to the user
+            timeDisplay.setText("YOU WIN ROUND");
+            //Play the win sound
+            soundManager.PlayWinSound();
+            //Increment the user's score by 100
+            ScoreManager.userScore += 100;
+            //Switch back to the main game screen
             switchToNewHighScoreScreen();
         }
+       else if(result == true && isHighScore == true)
+       {
+           //Display the end game condition to the user
+           timeDisplay.setText("YOU WIN ROUND");
+           //Play the win sound
+           soundManager.PlayWinSound();
+           //Increment the user's score by 100
+           ScoreManager.userScore += 100;
+           //Switch back to the main game screen
+           switchBackToMainScreen();
+       }
         else if(result == true && isHighScore == false)
         {
             //Display the end game condition to the user
