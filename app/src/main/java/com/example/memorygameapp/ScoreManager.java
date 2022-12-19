@@ -1,7 +1,9 @@
 package com.example.memorygameapp;
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -9,20 +11,37 @@ import java.util.List;
 
 public class ScoreManager extends AppCompatActivity
 {
+    private static ScoreManager _scoreManager = null;
     HighScore highScore = new HighScore();
-    List<HighScore> highscores;
-    DatabaseManager db;
+    static int round = 0;
+    static int userScore;
+
+    static List<HighScore> highscores;
+    static DatabaseManager db;
+
+    static String userName;
+
+
+    Context context = this.getApplicationContext();
+    public static ScoreManager getInstance()
+    {
+        //lazy initialization
+        if(_scoreManager == null)
+        {
+            _scoreManager = new ScoreManager();
+        }
+
+        return _scoreManager;
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-    }
-
-    public ScoreManager(Context context)
+    protected void onCreate(Bundle savedInstanceState)
     {
-        db = new DatabaseManager(context);
+        super.onCreate(savedInstanceState);
+        //db = new DatabaseManager(this.getApplicationContext());
     }
+
+    public ScoreManager() {}
 
     public void buildNewHighScore(String name, int highScore)
     {
@@ -39,43 +58,77 @@ public class ScoreManager extends AppCompatActivity
         db.addRecordToDatabase(highScore);
     }
 
-    public void AddTestScoreData()
+    public static void AddTestScoreData()
     {
-        db.addRecordToDatabase(new HighScore<HighScore>("Frodo", 12));
-        db.addRecordToDatabase(new HighScore<HighScore>("Dobby", 16));
-        db.addRecordToDatabase(new HighScore<HighScore>("DarthV", 20));
-        db.addRecordToDatabase(new HighScore<HighScore>("Bob", 18));
-        db.addRecordToDatabase(new HighScore<HighScore>( "Gemma", 22));
-        db.addRecordToDatabase(new HighScore<HighScore>( "Joe", 30));
-        db.addRecordToDatabase(new HighScore<HighScore>("DarthV", 22));
-        db.addRecordToDatabase(new HighScore<HighScore>("Gandalf", 132));
+        db.addRecordToDatabase(new HighScore<HighScore>("JIM", 10));
+        db.addRecordToDatabase(new HighScore<HighScore>("ACE", 20));
 
         //Display the results
         DisplayScores();
     }
 
-    public void DisplayScores()
+    /**
+     * Displays the high scores in the log
+     */
+    public static void DisplayScores()
     {
-
         //Get and store all the records in the db:
         highscores = db.getAllHighscore();
 
-        for (HighScore cn : highscores)
+        if(highscores != null)
         {
-            String log = "Id: " + cn.getID() + " ,Name: " + cn.getName() + " ,Highscore: " +
-                    cn.getHighscore();
-            Log.i("Name: ", log);
+            for (HighScore cn : highscores)
+            {
+                String log = "Id: " + cn.getID() + " ,Name: " + cn.getName() + " ,Highscore: " +
+                        cn.getHighscore();
+                Log.i("Name: ", log);
 
+            }
+
+            Log.i("divider", "====================");
+
+            HighScore singleUser = db.getHighScoreWithID(5);
+            Log.i("contact 5 is ", singleUser.getName());
+
+            Log.i("divider", "====================");
+
+            // Calling SQL statement
+            int userCount = db.getRecordCount();
         }
+    }
 
-        Log.i("divider", "====================");
+    /**
+     * Checks if the user's score is a high score
+     * @return
+     */
+    public static boolean CheckIfHighScore()
+    {
+        List<HighScore> userScores = db.getAllHighscore();
+        boolean result = true;
 
-        HighScore singleUser = db.getHighScoreWithID(5);
-        Log.i("contact 5 is ", singleUser.getName());
+//        if(userScores != null)
+//        {
+//            for(HighScore score : userScores)
+//            {
+//                if(userScore > score.getHighscore())
+//                {
+//                    result = true;
+//                    break;
+//                }
+//            }
+//        }
+//        else{
+//            result = true;
+//        }
 
-        Log.i("divider", "====================");
+        return result;
+    }
 
-        // Calling SQL statement
-        int userCount = db.getRecordCount();
+    /**
+     * Saves a new high score to the database
+     */
+    public static void AddHighscore()
+    {
+        db.addRecordToDatabase(new HighScore<HighScore>(userName, userScore));
     }
 }

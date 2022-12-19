@@ -72,4 +72,10 @@ public class HighScore <HighScore>
     {
         this.playerHighScore = highscore;
     }
+
+    @Override
+    public String toString()
+    {
+        return "Name: " + playerName + " Score: "  + String.valueOf(playerHighScore);
+    }
 }

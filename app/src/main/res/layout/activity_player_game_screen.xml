@@ -107,7 +107,6 @@
         android:layout_height="100dp"
         android:background="@drawable/roundbtn"
         android:backgroundTint="@color/Green"
-        android:onClick="doHighScoreTable"
         android:text="PLAY"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guideline2"

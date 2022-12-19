@@ -28,8 +28,9 @@ public class MainActivity extends AppCompatActivity
     int sequenceCount = 4, n = 0;
     private Object mutex = new Object();
     int[] gameSequence = new int[120];
-    int[] userGameSequence = new int[120];
     int counter = 0;
+    int sequenceLength = 4;
+
 
     TextView timeDisplay;
 
@@ -52,10 +53,24 @@ public class MainActivity extends AppCompatActivity
 
         timeDisplay = findViewById(R.id.txt_Time);
 
-//        //TODO: testing db
-//        scoremanager = new ScoreManager(mContext);
-//        scoremanager.buildNewHighScore("TestUser", 1500);
-//        scoremanager.AddTestScoreData();
+        Intent intent = getIntent();
+
+        int[] previousSequence = intent.getIntArrayExtra("previousSequence");
+        sequenceLength = intent.getIntExtra("sequenceLength", 0);
+
+        if(sequenceLength == 0)
+        {
+            sequenceLength = sequenceCount;
+        }
+
+        for(int i = 0; i < sequenceCount; i++)
+        {
+            gameSequence[i] = getRandom(sequenceCount);
+        }
+
+        //Add some test data to db
+        ScoreManager.db = new DatabaseManager(getApplicationContext());
+        ScoreManager.AddTestScoreData();
     }
 
     public void doPlay(View view) {
@@ -68,13 +83,11 @@ public class MainActivity extends AppCompatActivity
         return ((int) ((Math.random() * maxValue) + 1));
     }
 
-    private void oneButton()
+    private void oneButton(int id)
     {
-        n = getRandom(sequenceCount);
-
         Toast.makeText(this, "Number = " + n, Toast.LENGTH_SHORT).show();
 
-        switch (n) {
+        switch (id) {
             case 1:
                 flashButton(btnRed);
                 gameSequence[counter++] = RED;
@@ -129,13 +142,13 @@ public class MainActivity extends AppCompatActivity
     }
 
     /*Timer*/
-    CountDownTimer ct = new CountDownTimer(6000,  1500)
+    CountDownTimer ct = new CountDownTimer(6000,  1000)
     {
         public void onTick(long millisUntilFinished)
         {
             timeDisplay.setText("seconds remaining: " + millisUntilFinished / 1500);
-            oneButton();
-            //here you can have your logic to set text to edittext
+            n = gameSequence[counter];
+            oneButton(n);
         }
 
         public void onFinish()
@@ -159,57 +172,5 @@ public class MainActivity extends AppCompatActivity
         Intent playerGameScreen = new Intent(this, PlayerGameScreen.class);
         playerGameScreen.putExtra("gameSequence", gameSequence);
         startActivity(playerGameScreen);
-    }
-
-    public void doHighScoreTable(View view)
-    {
-        //Create new intent instance for the high score table
-        Intent summaryPage = new Intent(this, HighScoreTable.class);
-        startActivity(summaryPage);
-    }
-
-    /**
-     * Checks the sequence inputby the user matches
-     * the sequence shown
-     * @param userGameSequence
-     */
-    public boolean CheckPlayersInputSequence(int[] userGameSequence)
-    {
-        boolean doesMatch = false;
-        boolean[] results = new boolean[gameSequence.length];
-
-        for (int i = 0; i < gameSequence.length; i++) {
-            for (int j = 0; j < userGameSequence.length; j++) {
-                if (gameSequence[i] == userGameSequence[j]) {
-                    results[i] = true;
-                } else {
-                    results[i] = false;
-                }
-            }
-        }
-
-        for (int i = 0; i < results.length; i++)
-        {
-            if(results[i] == true)
-            {
-                doesMatch = true;
-                continue;
-            }
-            else
-            {
-                doesMatch=false;
-                break;
-            }
-        }
-        return doesMatch;
-    }
-
-    /**
-     * Adds the user's input to the game sequence
-     * @param input
-     */
-    public void RegisterInput(int input)
-    {
-        userGameSequence[counter++] = input;
     }
 }

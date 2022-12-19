@@ -62,9 +62,6 @@ public class PlayerGameScreen extends AppCompatActivity implements SensorEventLi
         //Disable the top bar as it is not needed.
         getSupportActionBar ().hide ();
 
-        //Database setup
-        Context mContext = getApplicationContext();
-
         btnRed = findViewById(R.id.btnRed);
         btnYellow = findViewById(R.id.btnYellow);
         btnGreen = findViewById(R.id.btnGreen);
@@ -73,7 +70,7 @@ public class PlayerGameScreen extends AppCompatActivity implements SensorEventLi
         timeDisplay = findViewById(R.id.txt_Time);
 
 //        //TODO: testing db
-//        scoremanager = new ScoreManager(mContext);
+//          scoremanager = new ScoreManager();
 //        scoremanager.buildNewHighScore("TestUser", 1500);
 //        scoremanager.AddTestScoreData();
 
@@ -83,7 +80,8 @@ public class PlayerGameScreen extends AppCompatActivity implements SensorEventLi
         //Get and store the game sequence from the main activity
         gameSequence = intent.getIntArrayExtra("gameSequence");
 
-        for (int i=0;i < counter;i++)
+        Log.d("Sequence length passed: ", String.valueOf(gameSequence.length));
+        for (int i=0;i < gameSequence.length;i++)
         {
             Log.d("sequence", String.valueOf(gameSequence[i]));
         }
@@ -100,6 +98,7 @@ public class PlayerGameScreen extends AppCompatActivity implements SensorEventLi
             //Check if the game is in play and only start timer if it is not
             if(isInPlay == false)
             {
+                ScoreManager.round++;
                 ct.start();
             }
 
@@ -260,14 +259,24 @@ public class PlayerGameScreen extends AppCompatActivity implements SensorEventLi
         //Check the sequence input against the one from the main activity
         boolean result =  CheckPlayersInputSequence(userGameSequence);
 
-        if(result == true)
+        boolean isHighScore = ScoreManager.CheckIfHighScore();
+        Log.d("IsHighScore is: ", String.valueOf(isHighScore));
+
+        if(isHighScore && result == true)
+        {
+            //Show the new high score screen
+            switchToNewHighScoreScreen();
+        }
+        else if(result == true && isHighScore == false)
         {
             //Display the end game condition to the user
             timeDisplay.setText("YOU WIN ROUND");
             //Play the win sound
             soundManager.PlayWinSound();
+            //Increment the user's score by 100
+            ScoreManager.userScore += 100;
             //Switch back to the main game screen
-            //switchBackToMainScreen();
+            switchBackToMainScreen();
         }
         else
         {
@@ -276,7 +285,7 @@ public class PlayerGameScreen extends AppCompatActivity implements SensorEventLi
             //Play the lose sound
             soundManager.PlayLoseSound();
             //Switch to the high score screen instead
-            //switchBackToHighScoreScreen();
+            switchBackToHighScoreScreen();
         }
     }
 
@@ -287,6 +296,9 @@ public class PlayerGameScreen extends AppCompatActivity implements SensorEventLi
     {
         //Create new intent instance for the high score table
         Intent mainGameScreen = new Intent(this, MainActivity.class);
+        mainGameScreen.putExtra("previousSequence", gameSequence);
+        //Double the sequence length for the next game
+        mainGameScreen.putExtra("sequenceLength", counter*2);
         startActivity(mainGameScreen);
     }
 
@@ -301,6 +313,17 @@ public class PlayerGameScreen extends AppCompatActivity implements SensorEventLi
     }
 
     /**
+     * Switches to the highscore results screen
+     */
+    public void switchToNewHighScoreScreen()
+    {
+        //Create new intent instance for the new high score screen
+        Intent newHighScoreScreen = new Intent(this, NewHighScore.class);
+        newHighScoreScreen.putExtra("scoreValue", ScoreManager.userScore);
+        startActivity(newHighScoreScreen);
+    }
+
+    /**
      * Resets all the sequence values and the displayed text for a new round
      */
     public void ResetGame()
@@ -309,12 +332,6 @@ public class PlayerGameScreen extends AppCompatActivity implements SensorEventLi
         for (int i : userGameSequence)
         {
             i=0;
-        }
-
-        //Iterate through the game sequence's inputs and reset to zero
-        for (int j : gameSequence)
-        {
-            j=0;
         }
 
         timeDisplay.setText("Player's turn!");
