@@ -46,12 +46,14 @@ public class NewHighScore extends AppCompatActivity {
         startActivity(highscorescreen);
     }
 
-    /**
-     * Clears the placeholder text from the name field on Click
-     * @param view
-     */
-    public void doClearText(View view)
-    {
-        name.setText("");
-    }
+    //TODO: Code no longer used as caused issue with android keyboard whereby the textbox
+    //opened but each touch would clear the value once more. As a result, deprecating.
+//    /**
+//     * Clears the placeholder text from the name field on Click
+//     * @param view
+//     */
+//    public void doClearText(View view)
+//    {
+//        name.setText("");
+//    }
 }
