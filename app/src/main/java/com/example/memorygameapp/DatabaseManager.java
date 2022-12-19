@@ -11,11 +11,11 @@ import java.util.List;
 public class DatabaseManager extends SQLiteOpenHelper
 {
     private static final int DATABASE_VERSION = 1;
+    private static final String KEY_NAME = "name";
+    private static final String KEY_HIGHSCORE = "highscore";
     private static final String DATABASE_NAME = "highscoreDatabase";
     private static final String TABLE_HIGHSCORE = "highscore";
     private static final String KEY_ID = "id";
-    private static final String KEY_NAME = "name";
-    private static final String KEY_HIGHSCORE = "highscore";
 
     /**
      * Default Constructor
@@ -36,7 +36,12 @@ public class DatabaseManager extends SQLiteOpenHelper
         db.execSQL(CREATE_HIGHSCORE_TABLE);
     }
 
-    // Upgrading database
+    /**
+     * Runs when upgrading the DB
+     * @param db
+     * @param oldVersion
+     * @param newVersion
+     */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
     {
@@ -65,6 +70,7 @@ public class DatabaseManager extends SQLiteOpenHelper
         db.close(); // Closing database connection
     }
 
+    //region - Methods unused but left in place for testing
     /**
      * Updates a given record in the db
      * @param highscore
@@ -83,7 +89,10 @@ public class DatabaseManager extends SQLiteOpenHelper
                 new String[] { String.valueOf(highscore.getID()) });
     }
 
-    // Deleting single contact
+    /**
+     * Deletes a given record from the database
+     * @param highscore
+     */
     public void deleteHighScore(HighScore highscore)
     {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -91,6 +100,7 @@ public class DatabaseManager extends SQLiteOpenHelper
                 new String[] { String.valueOf(highscore.getID()) });
         db.close();
     }
+    //endregion
 
     /**
      * Returns the number of records held within the database
@@ -114,7 +124,9 @@ public class DatabaseManager extends SQLiteOpenHelper
      * @param id
      * @return
      */
-    HighScore getHighScoreWithID(int id) {
+    HighScore getHighScoreWithID(int id)
+    {
+        //Open the DB
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = db.query(TABLE_HIGHSCORE,
@@ -151,6 +163,7 @@ public class DatabaseManager extends SQLiteOpenHelper
         // SQL SELECT ALL STATEMENT
         String selectQuery = "SELECT  * FROM " + TABLE_HIGHSCORE;
 
+        //Open the db
         SQLiteDatabase db = this.getWritableDatabase();
 
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -173,29 +186,35 @@ public class DatabaseManager extends SQLiteOpenHelper
         return highscoreList;
     }
 
-    //TODO: TESTING GETTING TOP 5
+    /**
+     * Returns the Top 5 scores stored in the DB
+     * @return
+     */
     public List<HighScore> GetTopFiveScores()
     {
+        //CREATE a new collection to store our results
         List<HighScore> topFiveHighscoreList = new ArrayList<HighScore>();
-        // Select All Query
 
-        String selectFilterQuery = "SELECT id, name, highscore FROM " + TABLE_HIGHSCORE + " ORDER BY CAST(highscore as INTEGER) DESC LIMIT 5";
+        //Perform the SQL SELECT STATEMENT
+        String filterResultsQuery = "SELECT id, name, highscore FROM " + TABLE_HIGHSCORE + " ORDER BY CAST(highscore as INTEGER) DESC LIMIT 5";
 
-        //Get access to the db
+        //Open the DB
         SQLiteDatabase db = this.getWritableDatabase();
 
-        Cursor cursor = db.rawQuery(selectFilterQuery, null);
+        Cursor cursor = db.rawQuery(filterResultsQuery, null);
 
-       //Iterate through each row and add to the list
-        if (cursor.moveToFirst()) {
-            do {
-
-                HighScore highscore = new HighScore();
-                highscore.setID(Integer.parseInt(cursor.getString(0)));
-                highscore.setName(cursor.getString(1));
-                highscore.setHighscore(Integer.parseInt(cursor.getString(2)));
-                //Add the record to the list
-                topFiveHighscoreList.add(highscore);
+       //Iterate through each row and add each to the list
+        if (cursor.moveToFirst())
+        {
+            do
+            {
+                    //Create a new high score instance & populate with data
+                    HighScore highscore = new HighScore();
+                    highscore.setID(Integer.parseInt(cursor.getString(0)));
+                    highscore.setName(cursor.getString(1));
+                    highscore.setHighscore(Integer.parseInt(cursor.getString(2)));
+                    //Add the high score record to the list
+                    topFiveHighscoreList.add(highscore);
             } while (cursor.moveToNext());
         }
         //Return the list of records
