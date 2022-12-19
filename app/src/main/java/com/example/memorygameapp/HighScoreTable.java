@@ -33,6 +33,8 @@ public class HighScoreTable extends ListActivity {
      */
     public void doReturnToMain(View view)
     {
+        //Reset the game values for a new player or game
+        ScoreManager.ResetValues();
         Intent mainScreen = new Intent(this, MainActivity.class);
         startActivity(mainScreen);
     }

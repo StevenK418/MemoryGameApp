@@ -129,4 +129,14 @@ public class ScoreManager extends AppCompatActivity
     {
         db.addRecordToDatabase(new HighScore<HighScore>(userName, userScore));
     }
+
+    /**
+     * Resets the user's game information
+     */
+    public static void ResetValues()
+    {
+        round = 0;
+        userScore = 0;
+        userName = "";
+    }
 }
