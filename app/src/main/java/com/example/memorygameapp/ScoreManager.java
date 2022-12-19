@@ -102,7 +102,7 @@ public class ScoreManager extends AppCompatActivity
     public static boolean CheckIfHighScore()
     {
         List<HighScore> userScores = db.GetTopFiveScores();
-        boolean result = true;
+        boolean result = false;
 
         if(userScores != null)
         {
